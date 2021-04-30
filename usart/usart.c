@@ -18,6 +18,8 @@
 
 #include "config.h"
 
+#ifdef ENABLE_USART
+
 #include "usart.h"
 #include "swo.h"
 
@@ -68,7 +70,7 @@ void usart_init(struct usart_device * usart, int speed, usart_callback rxcb, usa
 }
 
 int usart_write(struct usart_device * usart, const char* bytes, int len) {
-    if (bytes == 0 || len == 0)
+    if (bytes == NULL || len == 0)
         return 0;
 
     int count = 0;
@@ -82,6 +84,9 @@ int usart_write(struct usart_device * usart, const char* bytes, int len) {
 }
 
 int usart_read(struct usart_device * usart, char* bytes, int len) {
+    if (bytes == NULL || len == 0)
+        return 0;
+
     int count = 0;
     usart_fifo_t *rxfifo = usart->rxfifo;
     while(!RB_EMPTY(*rxfifo) && count < len) {
@@ -106,4 +111,6 @@ int usart_rx_has_data(struct usart_device * usart) {
 
 #if defined(STM32F4)
 #include "usart_f4.c"
+#endif
+
 #endif

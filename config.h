@@ -216,7 +216,7 @@
                             0xCC, 0xBB, 0xAA, 0x99, 0x44, 0x33, 0x22, 0x11
 #endif
 
-#if defined(STM32F4)
+#if defined(STM32F1) || defined(STM32F4)
 
 #define ENABLE_USART
 
@@ -228,9 +228,9 @@
 #define HSE_VALUE 8000000
 #endif
 
-// #ifndef SYS_CLOCK
-// #define SYS_CLOCK 72000000
-// #endif
+#ifndef SYS_CLOCK
+#define SYS_CLOCK 72000000UL
+#endif
 
 // #ifndef APB_PCLK1              // PCLK1
 // #define APB_PCLK1 36000000
