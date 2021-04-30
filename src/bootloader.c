@@ -18,6 +18,8 @@
 #include <stddef.h>
 #include "config.h"
 #include "stm32.h"
+#include "usart.h"
+#include "swo.h"
 #include "usb.h"
 #include "usb_dfu.h"
 #include "descriptors.h"
@@ -63,6 +65,10 @@ extern uint8_t  __romend;
 
 static uint32_t dfu_buffer[DFU_BUFSZ];
 static usbd_device dfu;
+
+#if defined(ENABLE_USART)
+static struct usart_device usart;
+#endif
 
 static struct dfu_data_s {
     uint8_t     (*flash)(void *romptr, const void *buf, size_t blksize);
@@ -294,9 +300,35 @@ static void dfu_init (void) {
     usbd_connect(&dfu, 1);
 }
 
+#if defined(ENABLE_USART)
+static void my_usart_rx_callback(struct usart_device *usart, int len) {
+    char data[128];
+    while(len > 0) {
+        int len1 = usart_read(usart, data, sizeof(data));
+        usart_write(usart, data, len1);
+        len -= len1;
+    }
+}
+#endif
+
 int main (void) {
+
+#if defined(ENABLE_USART)
+    usart_init(&usart, 115200, my_usart_rx_callback, NULL);
+    usart_write(&usart, "DRCC DFU\r\n", 10);
+#endif
+
     dfu_init();
     while(1) {
+#if defined(ENABLE_USART)
+        usart_poll(&usart);
+#endif
         usbd_poll(&dfu);
     }
 }
+
+#if defined(_EEPROM_ENABLED) && (defined(STM32F1) || defined(STM32F4))
+__attribute__((long_call, section(".ram_func"))) uint8_t program_eeprom(void *romaddr, const void *buffer, size_t blksize) {
+    return 0;
+}
+#endif
