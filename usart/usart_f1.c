@@ -71,7 +71,7 @@ void usart_init_int(struct usart_device * usart, int speed) {
 
     // usart init
     RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-    USART1->BRR = USART_BRR(SYS_CLOCK /*72000000UL*/, speed);
+    USART1->BRR = USART_BRR(SYS_CLOCK /*48000000UL*/, speed);
     USART1->CR1 = USART_CR1_UE | USART_CR1_TE |
                   USART_CR1_RE ; // Enable USART
 

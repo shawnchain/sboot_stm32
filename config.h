@@ -229,7 +229,11 @@
 #endif
 
 #ifndef SYS_CLOCK
+#if defined(STM32F1)
+#define SYS_CLOCK 48000000UL
+#elif defined(STM32F4)
 #define SYS_CLOCK 72000000UL
+#endif
 #endif
 
 // #ifndef APB_PCLK1              // PCLK1
