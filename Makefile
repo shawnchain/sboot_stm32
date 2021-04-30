@@ -34,6 +34,8 @@ CRYPT_SRC  += src/magma.c
 CRYPT_SRC  += src/checksum.c src/crypto.c
 
 FW_SRC      = $(CRYPT_SRC) $(FWSTARTUP) src/descriptors.c src/bootloader.c src/rc5a.S src/chacha_a.S src/rc6a.S
+FW_SRC     += usart/stm32f4xx_gpio.c usart/stm32f4xx_rcc.c usart/stm32f4xx_usart.c usart/stm32f4xx_misc.c usart/usart.c src/swo.c
+
 SW_SRC      = $(CRYPT_SRC) src/encrypter.c
 TS_SRC      = $(filter-out src/crypto.c, $(CRYPT_SRC)) src/ctest.c
 
@@ -47,6 +49,7 @@ vpath %.S $(SRCPATH)
 #includes
 CMSISINC    = $(CMSISDEV)/ST $(CMSIS)/CMSIS/Include $(CMSIS)/CMSIS/Core/Include
 FWINCS      = $(CMSISINC) inc $(addsuffix /inc, $(MODULES)) .
+FWINCS     += usart
 SWINCS      = inc .
 
 #objects
@@ -60,8 +63,13 @@ MLIBS       = $(addprefix $(FWODIR)/lib, $(addsuffix .a, $(MODULES)))
 MDEFS       = USBD_SOF_DISABLED
 
 #compiler flags
+ifeq ($(DEBUG),1)
+SWCFLAGS    = -O0 -g
+FWCFLAGS    = -mthumb -O0 -Wall -std=gnu99 -fdata-sections -ffunction-sections -g
+else
 SWCFLAGS    = -O2
 FWCFLAGS    = -mthumb -Os -Wall -std=gnu99 -fdata-sections -ffunction-sections
+endif
 FWXFLAGS    = -flto
 
 #linker flags
@@ -566,6 +574,25 @@ stm32f405xg :
 	                   FWSTARTUP='mcu/stm32f4xx.S' \
 	                   FWDEFS='STM32F4 STM32F405xx' \
 	                   LDPARAMS='ROMLEN=1024K RAMLEN=128K APPALIGN=0x4000'
+
+
+stm32f401xc_eeprom :
+	$(MAKE) bootloader FWCPU='-mcpu=cortex-m4' \
+	                   FWSTARTUP='mcu/stm32f4xx.S' \
+	                   FWDEFS='STM32F4 STM32F401xC FLASH_EEPROM_BASE=0x08004000 FLASH_EEPROM_END=0x08008000' \
+	                   LDPARAMS='ROMLEN=256K RAMLEN=64K APPALIGN=0x8000'
+
+stm32f401xc :
+	$(MAKE) bootloader FWCPU='-mcpu=cortex-m4' \
+	                   FWSTARTUP='mcu/stm32f4xx.S' \
+	                   FWDEFS='STM32F4 STM32F401xC' \
+	                   LDPARAMS='ROMLEN=256K RAMLEN=64K APPALIGN=0x8000'
+
+stm32f411xc :
+	$(MAKE) bootloader FWCPU='-mcpu=cortex-m4' \
+	                   FWSTARTUP='mcu/stm32f4xx.S' \
+	                   FWDEFS='STM32F4 STM32F411xE' \
+	                   LDPARAMS='ROMLEN=256K RAMLEN=128K APPALIGN=0x4000'
 
 stm32f405xg_hs :
 	$(MAKE) bootloader FWCPU='-mcpu=cortex-m4' \

@@ -1,0 +1,34 @@
+target extended-remote :50000
+
+# change the file name
+file "build/firmware.elf"
+
+#monitor reset init
+#monitor halt
+
+###################################################################
+# Change the CPU frequency according to your board
+#
+
+# # capture ITM SWO out to file
+monitor tpiu config internal ./build/itm.out uart off 72000000
+# monitor tpiu config internal - uart off 180000000
+
+# or capture ITM SWO out via USB2TTL@115200
+# monitor tpiu config external uart off 96000000 115200
+# monitor tpiu config external uart off 180000000 115200
+
+# enable ITM port0
+monitor itm port 0 on
+
+# load and run!
+load
+
+# try to stop at main entry point
+# break main
+
+# stop at the very first line of code
+# stepi
+
+# # or just continue
+continue

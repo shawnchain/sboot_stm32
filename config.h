@@ -97,11 +97,11 @@
 #endif
 /* USB manufacturer string */
 #ifndef DFU_STR_MANUF
-#define DFU_STR_MANUF       "Your company name"
+#define DFU_STR_MANUF       "DRCC"
 #endif
 /* USB product sting */
 #ifndef DFU_STR_PRODUCT
-#define DFU_STR_PRODUCT     "Secure bootloader"
+#define DFU_STR_PRODUCT     "DRCC DFU Device"
 #endif
 /* USB string for DFU configureation string descriptor. */
 #ifndef DFU_DSC_CONFIG
@@ -117,7 +117,7 @@
 #ifndef DFU_STR_FLASH
 #define DFU_STR_FLASH       "Internal flash"
 #endif
-/* USB string for DFU EEPROM interface sreing descriptor */
+/* USB string for DFU EEPROM interface string descriptor */
 #ifndef DFU_DSC_EEPROM
 #define DFU_DSC_EEPROM      _ENABLE
 #endif
@@ -147,7 +147,8 @@
 #endif
 /* DFU bootstrap port/pin settings. Set GPIOx or _DISABLE */
 #ifndef DFU_BOOTSTRAP_GPIO
-#define DFU_BOOTSTRAP_GPIO  GPIOA
+// #define DFU_BOOTSTRAP_GPIO  GPIOA
+#define DFU_BOOTSTRAP_GPIO  _DISABLE
 #endif
 #ifndef DFU_BOOTSTRAP_PIN
 #define DFU_BOOTSTRAP_PIN   1
@@ -175,7 +176,8 @@
 #endif
 /* Cipher to use. set _DISABLE or choose from implemented ciphers */
 #ifndef DFU_CIPHER
-#define DFU_CIPHER          DFU_CIPHER_RC5
+// #define DFU_CIPHER          DFU_CIPHER_RC5
+#define DFU_CIPHER          _DISABLE
 #endif
 #ifndef DFU_CIPHER_MODE
 #define DFU_CIPHER_MODE     DFU_CIPHER_CBC
@@ -212,6 +214,31 @@
 #ifndef DFU_AES_IV_128
 #define DFU_AES_IV_128      0x44, 0x33, 0x22, 0x11, 0x88, 0x77, 0x66, 0x55,\
                             0xCC, 0xBB, 0xAA, 0x99, 0x44, 0x33, 0x22, 0x11
+#endif
+
+#if defined(STM32F4)
+
+#define ENABLE_USART
+
+#ifndef HSI_VALUE
+#define HSI_VALUE 16000000
+#endif
+
+#ifndef HSE_VALUE
+#define HSE_VALUE 8000000
+#endif
+
+// #ifndef SYS_CLOCK
+// #define SYS_CLOCK 72000000
+// #endif
+
+// #ifndef APB_PCLK1              // PCLK1
+// #define APB_PCLK1 36000000
+// #endif
+
+// #ifndef APB_PCLK2              // PCLK2
+// #define APB_PCLK2 72000000
+// #endif
 #endif
 
 #endif // _DFU_BOOTLOADER_H_
