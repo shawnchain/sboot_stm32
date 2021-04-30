@@ -42,28 +42,27 @@ static void GPIOConfigPin(GPIO_TypeDef *port_ptr, uint32_t pin, uint32_t mode_cn
 	volatile uint32_t *cr_ptr;
 	uint32_t cr_value;
 
-	cr_ptr = &port_ptr->CRL;  // configuration of pins [0,7] is in CRL
+	cr_ptr = &port_ptr->CRL;                            // configuration of pins [0,7] is in CRL
 
-	if (pin >= 8)			        // is pin in [8; 15]?
-	{									        // configuration of pins [8,15] is in CRH
-		cr_ptr++;               // advance to next struct element CRL -> CRH
-		pin -= 8;               // crop the pin number
+	if (pin >= 8)			                            // is pin in [8; 15]?
+	{									                // configuration of pins [8,15] is in CRH
+		cr_ptr++;                                       // advance to next struct element CRL -> CRH
+		pin -= 8;                                       // crop the pin number
 	}
 
-	cr_value = *cr_ptr;			  // localize the CRL / CRH value
-
-	cr_value &= ~(0xF << (pin * 4));	// clear the MODE and CNF fields (now that pin is an analog input)
+	cr_value = *cr_ptr;			                        // localize the CRL / CRH value
+	cr_value &= ~(0xF << (pin * 4));	                // clear the MODE and CNF fields (now that pin is an analog input)
 	cr_value |= (mode_cnf_value << (pin * 4));	        // save new MODE and CNF value for desired pin
 
-	*cr_ptr = cr_value;				// save localized value to CRL / CRL
+	*cr_ptr = cr_value;				                    // save localized value to CRL / CRL
 }
 
 void usart_init_int(struct usart_device * usart, int speed) {
     // gpio init, set GPIOA pins to input with pull-down
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
-	// GPIOA->CRL = 0x88888888;
-	// GPIOA->CRH = 0x88888888;
-	// GPIOA->ODR = 0;
+    // RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+    // GPIOA->CRL = 0x88888888;
+    // GPIOA->CRH = 0x88888888;
+    // GPIOA->ODR = 0;
 
     // usart pin config
     GPIOConfigPin(PORT_USART1_TXD, PIN_USART1_TXD, GPIO_CRL_MODE0_1|GPIO_CRL_CNF0_1);
@@ -74,8 +73,6 @@ void usart_init_int(struct usart_device * usart, int speed) {
     USART1->BRR = USART_BRR(SYS_CLOCK /*48000000UL*/, speed);
     USART1->CR1 = USART_CR1_UE | USART_CR1_TE |
                   USART_CR1_RE ; // Enable USART
-
-    // NVIC_EnableIRQ(USART1_IRQn);
 }
 
 const int TX_WAIT_TIMEOUT = 36000;
