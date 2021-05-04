@@ -81,6 +81,7 @@ void usart_poll(struct usart_device * usart) {
     // Sending(polling mode)
     int txcount = 0;
     usart_fifo_t *txfifo = (usart_fifo_t*)usart->txfifo;
+
     while (!RB_EMPTY(*txfifo) && (USART1->SR & USART_FLAG_TXE) > 0) {
         // USART_SendData(USART1, RB_GET(*txfifo));
         USART1->DR = RB_GET(*txfifo);
@@ -93,7 +94,6 @@ void usart_poll(struct usart_device * usart) {
 
         if (wait == TX_WAIT_TIMEOUT)  // about 1ms wait time out.
             break;
-
     }
 
     if (txcount > 0 && usart->txcb) {

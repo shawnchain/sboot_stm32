@@ -25,6 +25,7 @@
 #include "swo.h"
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 
 usart_fifo_t rxFIFO1 = {.size=USART_FIFO_SIZE};
@@ -83,12 +84,16 @@ int usart_printf(struct usart_device * usart, const char* fmt, ...) {
 #endif
 }
 
-int usart_read(struct usart_device * usart, unsigned char* bytes, int len) {
+static int usart_read_(struct usart_device * usart, unsigned char* bytes, int len, bool force_read) {
     if (bytes == NULL || len == 0)
         return 0;
 
     int count = 0;
     usart_fifo_t *rxfifo = usart->rxfifo;
+
+    if (!force_read && RB_COUNT(*rxfifo) < len)
+        return 0;
+
     while(!RB_EMPTY(*rxfifo) && count < len) {
         bytes[count] = RB_GET(*rxfifo);
         count++;
@@ -98,6 +103,14 @@ int usart_read(struct usart_device * usart, unsigned char* bytes, int len) {
         RB_RESET(*rxfifo);
 
     return count;
+}
+
+int usart_read(struct usart_device * usart, unsigned char* bytes, int len) {
+    return usart_read_(usart, bytes, len, false);
+}
+
+int usart_read_force(struct usart_device * usart, unsigned char* bytes, int len) {
+    return usart_read_(usart, bytes, len, true);
 }
 
 int usart_rx_has_data(struct usart_device * usart) {

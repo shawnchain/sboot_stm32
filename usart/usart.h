@@ -51,6 +51,8 @@ void usart_disable(struct usart_device * usart);
 
 int usart_read(struct usart_device * usart, unsigned char* bytes, int len);
 
+int usart_read_force(struct usart_device * usart, unsigned char* bytes, int len);
+
 int usart_rx_has_data(struct usart_device * usart);
 
 int usart_write(struct usart_device * usart, const unsigned char* bytes, int len);
