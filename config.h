@@ -216,16 +216,22 @@
                             0xCC, 0xBB, 0xAA, 0x99, 0x44, 0x33, 0x22, 0x11
 #endif
 
-#define ENABLE_USB
-
-#if defined(STM32F1) || defined(STM32F4)
-
-#define ENABLE_USART
-
+/** Tiny printf */
 #define ENABLE_TINY_PRINTF
 // #define PRINTF_SUPPORT_FLOAT
 // #define PRINTF_SUPPORT_EXPONENTIAL
 
+/** Hash Algorithm */
+// #define ENABLE_MD5
+// #define ENABLE_SHA1
+// #define ENABLE_SHA256
+
+/** Enable USB DFU */
+#define ENABLE_USB
+
+/** Enable USART DFU, currently only F1/F4 are supported */
+#if defined(STM32F1) || defined(STM32F4)
+#define ENABLE_USART
 #ifndef HSI_VALUE
 #define HSI_VALUE 16000000
 #endif
