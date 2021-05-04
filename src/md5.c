@@ -64,8 +64,13 @@ void md5Final(Md5Context *context, uint8_t *digest);
 void md5FinalRaw(Md5Context *context, uint8_t *digest);
 void md5ProcessBlock(Md5Context *context);
 
-#define htole32(l) l
-#define letoh32(l) l
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#define htole32(x) 		(x)
+#define letoh32(x) 		(x)
+#else
+#define htole32(x)      __builtin_bswap32(x)
+#define letoh32(x)      __builtin_bswap32(x)
+#endif
 
 #define MIN(x,y) ((x < y)?x : y)
 #define ROL32(a, n) (((a) << (n)) | ((a) >> (32 - (n))))

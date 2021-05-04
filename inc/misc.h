@@ -7,9 +7,13 @@
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 #define CPUTOBE32(x)    __builtin_bswap32(x)
 #define BE32TOCPU(x)    __builtin_bswap32(x)
+#define CPUTOBE16(x)    __builtin_bswap16(x)
+#define BE16TOCPU(x)    __builtin_bswap16(x)
 #else
 #define CPUTOBE32(x)    (x)
 #define BE32TOCPU(x)    (x)
+#define CPUTOBE16(x)    (x)
+#define BE16TOCPU(x)    (x)
 #endif
 
 

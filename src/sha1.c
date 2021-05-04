@@ -36,6 +36,7 @@
 #include "config.h"
 
 #include "sha1.h"
+
 #include <string.h>
 
 #if defined(ENABLE_SHA1)
@@ -64,9 +65,14 @@ void sha1Final(Sha1Context *context, uint8_t *digest);
 void sha1FinalRaw(Sha1Context *context, uint8_t *digest);
 void sha1ProcessBlock(Sha1Context *context);
 
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#define htobe32(x)      __builtin_bswap32(x)
+#define betoh32(x)      __builtin_bswap32(x)
+#else
+#define htobe32(x)      (x)
+#define betoh32(x)      (x)
+#endif
 
-#define htobe32(l) __builtin_bswap32(l)
-#define betoh32(l) __builtin_bswap32(l)
 #define MIN(x,y) ((x < y)?x : y)
 #define ROL32(a, n) (((a) << (n)) | ((a) >> (32 - (n))))
 

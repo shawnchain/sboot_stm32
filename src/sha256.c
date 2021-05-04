@@ -35,6 +35,7 @@
 
 #include "config.h"
 #include "sha256.h"
+#include "misc.h"
 
 #include <string.h>
 
@@ -64,8 +65,14 @@ void sha256FinalRaw(Sha256Context *context, uint8_t *digest);
 void sha256ProcessBlock(Sha256Context *context);
 
 
-#define htobe32(l) __builtin_bswap32(l)
-#define betoh32(l) __builtin_bswap32(l)
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#define htobe32(x)      __builtin_bswap32(x)
+#define betoh32(x)      __builtin_bswap32(x)
+#else
+#define htobe32(x)      (x)
+#define betoh32(x)      (x)
+#endif
+
 #define MIN(x,y) ((x < y)?x : y)
 #define ROL32(a, n) (((a) << (n)) | ((a) >> (32 - (n))))
 #define ROR32(a, n) (((a) >> (n)) | ((a) << (32 - (n))))
