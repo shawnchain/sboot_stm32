@@ -97,7 +97,7 @@
 #endif
 /* USB manufacturer string */
 #ifndef DFU_STR_MANUF
-#define DFU_STR_MANUF       "DRCC"
+#define DFU_STR_MANUF       "DRCC Team"
 #endif
 /* USB product sting */
 #ifndef DFU_STR_PRODUCT
@@ -216,9 +216,15 @@
                             0xCC, 0xBB, 0xAA, 0x99, 0x44, 0x33, 0x22, 0x11
 #endif
 
+#define ENABLE_USB
+
 #if defined(STM32F1) || defined(STM32F4)
 
 #define ENABLE_USART
+
+#define ENABLE_TINY_PRINTF
+// #define PRINTF_SUPPORT_FLOAT
+// #define PRINTF_SUPPORT_EXPONENTIAL
 
 #ifndef HSI_VALUE
 #define HSI_VALUE 16000000

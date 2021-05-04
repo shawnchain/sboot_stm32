@@ -23,6 +23,14 @@
 #define WEAK __attribute__ ((weak))
 #endif
 
+// USART FIFO Type
+#include "rb.h"
+#ifndef USART_FIFO_SIZE
+#define USART_FIFO_SIZE 128
+#endif
+DECL_RB_TYPE(usart_fifo_t, USART_FIFO_SIZE);
+
+// USART Device Type
 struct usart_device;
 typedef void (*usart_callback)(struct usart_device * usart, int count);
 struct usart_device {
@@ -41,11 +49,15 @@ void usart_enable(struct usart_device * usart);
 
 void usart_disable(struct usart_device * usart);
 
-int usart_read(struct usart_device * usart, char* bytes, int len);
+int usart_read(struct usart_device * usart, unsigned char* bytes, int len);
 
 int usart_rx_has_data(struct usart_device * usart);
 
-int usart_write(struct usart_device * usart, const char* bytes, int len);
+int usart_write(struct usart_device * usart, const unsigned char* bytes, int len);
+
+int usart_print(struct usart_device * usart, const char* str);
+
+int usart_printf(struct usart_device * usart, const char* fmt, ...);
 
 void usart_poll(struct usart_device * usart);
 

@@ -20,6 +20,7 @@
 
 #if defined(STM32F4) && defined(ENABLE_USART)
 #include "usart.h"
+#include "swo.h"
 
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_gpio.h"

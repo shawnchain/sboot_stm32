@@ -21,6 +21,7 @@
 #if defined(STM32F1) && defined(ENABLE_USART)
 #include "usart.h"
 #include "stm32.h"
+#include "rb.h"
 
 #define USART_DIV(__PCLK__, __BAUD__)     (((__PCLK__)*25)/(4*(__BAUD__)))
 #define USART_DIVMANT(__PCLK__, __BAUD__) (USART_DIV((__PCLK__), (__BAUD__))/100)

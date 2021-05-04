@@ -19,6 +19,7 @@
 #include "config.h"
 
 #ifdef ENABLE_USART
+#include "printf.h"
 
 #include "usart.h"
 #include "swo.h"
@@ -26,30 +27,6 @@
 #include <stdint.h>
 #include <string.h>
 
-// RingBuffer code, size should in power 2 bytes
-#define RB_SIZE(rb) ((rb).size)    // size in bytes (power 2)
-#define RB_MASK(rb) ((rb).size-1U) // buffer size mask for fast access
-
-// Buffer read / write macros
-#define RB_RESET(rb)         (rb).rdIdx = (rb).wrIdx = 0
-#define RB_PUT(rb, dataIn)   (rb).data[RB_MASK(rb) & ((rb).wrIdx++)] = (dataIn)
-#define RB_GET(rb)           ((rb).data[RB_MASK(rb) & ((rb).rdIdx++)])
-#define RB_EMPTY(rb)         ((rb).rdIdx == (rb).wrIdx)
-#define RB_FULL(rb)          (((rb).wrIdx > (rb).rdIdx) && (RB_MASK(rb) & (rb).rdIdx) == (RB_MASK(rb) & (rb).wrIdx))
-#define RB_COUNT(rb)         (RB_MASK(rb) & ((rb).wrIdx - (rb).rdIdx))
-
-// Declare the buffer type
-#define DECL_RB_TYPE(name, _size)                           \
-        typedef struct{                                     \
-            uint32_t size;                                  \
-            uint32_t wrIdx;                                 \
-            uint32_t rdIdx;                                 \
-            uint8_t data[_size];                            \
-        }name##_t
-
-#define USART_FIFO_SIZE 128
-// USART FIFO type
-DECL_RB_TYPE(usart_fifo, USART_FIFO_SIZE);
 usart_fifo_t rxFIFO1 = {.size=USART_FIFO_SIZE};
 usart_fifo_t txFIFO1 = {.size=USART_FIFO_SIZE};
 
@@ -69,7 +46,7 @@ void usart_init(struct usart_device * usart, int speed, usart_callback rxcb, usa
     usart_init_int(usart, speed);
 }
 
-int usart_write(struct usart_device * usart, const char* bytes, int len) {
+int usart_write(struct usart_device * usart, const unsigned char* bytes, int len) {
     if (bytes == NULL || len == 0)
         return 0;
 
@@ -83,7 +60,30 @@ int usart_write(struct usart_device * usart, const char* bytes, int len) {
     return count;
 }
 
-int usart_read(struct usart_device * usart, char* bytes, int len) {
+int usart_print(struct usart_device * usart, const char* str) {
+    if (str == NULL)
+        return 0;
+
+    return usart_write(usart, (unsigned char*)str, strlen(str));
+}
+
+int usart_printf(struct usart_device * usart, const char* fmt, ...) {
+#if defined(ENABLE_TINY_PRINTF)
+    char buf[128];
+    va_list va;
+    va_start(va, fmt);
+    int ret;
+    ret = vsnprintf(buf, sizeof(buf), fmt, va);
+    va_end(va);
+    usart_write(usart, (unsigned char*)buf, ret);
+    return ret;
+#else
+    // printf is disabled
+    return usart_print(usart, fmt);
+#endif
+}
+
+int usart_read(struct usart_device * usart, unsigned char* bytes, int len) {
     if (bytes == NULL || len == 0)
         return 0;
 
@@ -94,7 +94,7 @@ int usart_read(struct usart_device * usart, char* bytes, int len) {
         count++;
     }
 
-    if(count > 0)
+    if(count > 0 && RB_EMPTY(*rxfifo))
         RB_RESET(*rxfifo);
 
     return count;
@@ -104,13 +104,5 @@ int usart_rx_has_data(struct usart_device * usart) {
     usart_fifo_t *rxfifo = usart->rxfifo;
     return RB_COUNT(*rxfifo);
 }
-
-#if defined(STM32F1)
-#include "usart_f1.c"
-#endif
-
-#if defined(STM32F4)
-#include "usart_f4.c"
-#endif
 
 #endif
