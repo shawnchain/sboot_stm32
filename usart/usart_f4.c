@@ -103,7 +103,7 @@ void usart_poll(struct usart_device * usart) {
     // Receiving
     int rxcount = 0;
     usart_fifo_t *rxfifo = (usart_fifo_t*)usart->rxfifo;
-    while (!RB_FULL(*rxfifo) && (USART1->SR & USART_FLAG_RXNE) > 0) {
+    while ((USART1->SR & USART_FLAG_RXNE) > 0 && !RB_FULL(*rxfifo)) {
         RB_PUT(*rxfifo, USART1->DR);
         rxcount++;
     }

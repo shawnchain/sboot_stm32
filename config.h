@@ -217,9 +217,11 @@
 #endif
 
 /** Tiny printf */
+#if defined(DEBUG)
 #define ENABLE_TINY_PRINTF
 // #define PRINTF_SUPPORT_FLOAT
 // #define PRINTF_SUPPORT_EXPONENTIAL
+#endif
 
 /** Hash Algorithm */
 // #define ENABLE_MD5
