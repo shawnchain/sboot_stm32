@@ -28,8 +28,8 @@
 #include <stdbool.h>
 #include <string.h>
 
-usart_fifo_t rxFIFO1 = {.size=USART_FIFO_SIZE};
-usart_fifo_t txFIFO1 = {.size=USART_FIFO_SIZE};
+usart_rx_fifo_t rxFIFO1 = {.size=USART_RX_FIFO_SIZE};
+usart_tx_fifo_t txFIFO1 = {.size=USART_TX_FIFO_SIZE};
 
 void usart_init_int(struct usart_device * usart, int speed);
 
@@ -52,7 +52,7 @@ int usart_write(struct usart_device * usart, const unsigned char* bytes, int len
         return 0;
 
     int count = 0;
-    usart_fifo_t *txfifo = (usart_fifo_t*)usart->txfifo;
+    usart_tx_fifo_t *txfifo = usart->txfifo;
     while(!RB_FULL(*txfifo) && count < len){
         RB_PUT(*txfifo, bytes[count]);
         count++;
@@ -89,7 +89,7 @@ static int usart_read_(struct usart_device * usart, unsigned char* bytes, int le
         return 0;
 
     int count = 0;
-    usart_fifo_t *rxfifo = usart->rxfifo;
+    usart_rx_fifo_t *rxfifo = usart->rxfifo;
 
     if (!force_read && RB_COUNT(*rxfifo) < len)
         return 0;
@@ -114,7 +114,7 @@ int usart_read_force(struct usart_device * usart, unsigned char* bytes, int len)
 }
 
 int usart_rx_has_data(struct usart_device * usart) {
-    usart_fifo_t *rxfifo = usart->rxfifo;
+    usart_rx_fifo_t *rxfifo = usart->rxfifo;
     return RB_COUNT(*rxfifo);
 }
 

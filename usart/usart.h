@@ -25,17 +25,22 @@
 
 // USART FIFO Type
 #include "rb.h"
-#ifndef USART_FIFO_SIZE
-#define USART_FIFO_SIZE 128
+#ifndef USART_RX_FIFO_SIZE
+#define USART_RX_FIFO_SIZE 256
 #endif
-DECL_RB_TYPE(usart_fifo_t, USART_FIFO_SIZE);
+#ifndef USART_TX_FIFO_SIZE
+#define USART_TX_FIFO_SIZE 256
+#endif
+
+DECL_RB_TYPE(usart_tx_fifo_t, USART_TX_FIFO_SIZE);
+DECL_RB_TYPE(usart_rx_fifo_t, USART_RX_FIFO_SIZE);
 
 // USART Device Type
 struct usart_device;
 typedef void (*usart_callback)(struct usart_device * usart, int count);
 struct usart_device {
-    void * rxfifo;
-    void * txfifo;
+    usart_rx_fifo_t *rxfifo;
+    usart_tx_fifo_t *txfifo;
     void * info;
     usart_callback rxcb;
     usart_callback txcb;

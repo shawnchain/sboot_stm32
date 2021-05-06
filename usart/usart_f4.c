@@ -80,7 +80,7 @@ void usart_poll(struct usart_device * usart) {
 
     // Sending(polling mode)
     int txcount = 0;
-    usart_fifo_t *txfifo = (usart_fifo_t*)usart->txfifo;
+    usart_tx_fifo_t *txfifo = usart->txfifo;
 
     while (!RB_EMPTY(*txfifo) && (USART1->SR & USART_FLAG_TXE) > 0) {
         // USART_SendData(USART1, RB_GET(*txfifo));
@@ -102,10 +102,21 @@ void usart_poll(struct usart_device * usart) {
 
     // Receiving
     int rxcount = 0;
-    usart_fifo_t *rxfifo = (usart_fifo_t*)usart->rxfifo;
-    while ((USART1->SR & USART_FLAG_RXNE) > 0 && !RB_FULL(*rxfifo)) {
-        RB_PUT(*rxfifo, USART1->DR);
-        rxcount++;
+    uint8_t overflow = 0;
+    usart_rx_fifo_t *rxfifo = usart->rxfifo;
+    while ((USART1->SR & USART_FLAG_RXNE) > 0) {
+        uint8_t c = USART1->DR;
+        if (!RB_FULL(*rxfifo)){
+            RB_PUT(*rxfifo, c);
+            rxcount++;
+        } else {
+            overflow = 1;
+        }
+    }
+
+    if (overflow) {
+        rxcount = 0;
+        RB_RESET(*rxfifo);
     }
 
     if (rxcount > 0 && usart->rxcb) {
