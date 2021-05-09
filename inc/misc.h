@@ -9,11 +9,19 @@
 #define BE32TOCPU(x)    __builtin_bswap32(x)
 #define CPUTOBE16(x)    __builtin_bswap16(x)
 #define BE16TOCPU(x)    __builtin_bswap16(x)
+#define htobe32(x)      __builtin_bswap32(x)
+#define betoh32(x)      __builtin_bswap32(x)
+#define htobe16(x)      __builtin_bswap16(x)
+#define betoh16(x)      __builtin_bswap16(x)
 #else
 #define CPUTOBE32(x)    (x)
 #define BE32TOCPU(x)    (x)
 #define CPUTOBE16(x)    (x)
 #define BE16TOCPU(x)    (x)
+#define htobe32(x)      (x)
+#define betoh32(x)      (x)
+#define htobe16(x)      (x)
+#define betoh16(x)      (x)
 #endif
 
 

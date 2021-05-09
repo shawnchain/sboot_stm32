@@ -593,7 +593,7 @@ stm32f411xc :
 	$(MAKE) bootloader FWCPU='-mcpu=cortex-m4' \
 	                   FWSTARTUP='mcu/stm32f4xx.S' \
 	                   FWDEFS='STM32F4 STM32F411xE' \
-	                   LDPARAMS='ROMLEN=256K RAMLEN=128K APPALIGN=0x4000'
+	                   LDPARAMS='ROMLEN=256K RAMLEN=128K APPALIGN=0x8000'
 
 stm32f405xg_hs :
 	$(MAKE) bootloader FWCPU='-mcpu=cortex-m4' \
