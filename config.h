@@ -83,6 +83,10 @@
 #ifndef DFU_VERIFY_CHECKSUM
 #define DFU_VERIFY_CHECKSUM _DISABLE
 #endif
+/** Which checksum algorithm used by bootloader */
+#ifndef DFU_USE_CHECKSUM
+#define DFU_USE_CHECKSUM    _DISABLE
+#endif
 /** Memory Readout Protection level **/
 #ifndef DFU_SEAL_LEVEL
 #define DFU_SEAL_LEVEL      0

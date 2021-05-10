@@ -22,35 +22,41 @@
 #include <string.h>
 #include "config.h"
 #include "checksum.h"
+#include "endian.h"
 
 
-#if ((DFU_VERIFY_CHECKSUM == CRC32FAST) || (DFU_VERIFY_CHECKSUM == CRC32SMALL))
+#if ((DFU_USE_CHECKSUM == CRC32FAST) || (DFU_USE_CHECKSUM == CRC32SMALL))
     typedef uint32_t checksum_t;
     const char *checksum_name = "CRC-32";
     #define CRC_POLY 0xEDB88320UL
     #define CRC_INIT 0xFFFFFFFFUL
+    #define CRC_TO_BE(x) htobe32(x)
 
-#elif ((DFU_VERIFY_CHECKSUM == CRC64FAST) || (DFU_VERIFY_CHECKSUM == CRC64SMALL))
+#elif ((DFU_USE_CHECKSUM == CRC64FAST) || (DFU_USE_CHECKSUM == CRC64SMALL))
     typedef uint64_t checksum_t;
     const char *checksum_name = "CRC-64";
     #define CRC_POLY 0x95AC9329AC4BC9B5ULL
     #define CRC_INIT 0xFFFFFFFFFFFFFFFFULL
+    #define CRC_TO_BE(x) (uint64_t)htobe32(((x>>32) & 0xffffffff)) << 32 | htobe32((x & 0xffffffff))
 
-#elif (DFU_VERIFY_CHECKSUM == FNV1A32)
+#elif (DFU_USE_CHECKSUM == FNV1A32)
     typedef uint32_t checksum_t;
     const char *checksum_name = "FNV1A-32";
     #define FNV_OFFS 0x811c9dc5UL
     #define FNV_PRIM 16777619UL
+    #define CRC_TO_BE(x) htobe32(x)
 
-#elif (DFU_VERIFY_CHECKSUM == FNV1A64)
+#elif (DFU_USE_CHECKSUM == FNV1A64)
     const char *checksum_name = "FNV1A-64";
     typedef uint64_t checksum_t;
     #define FNV_OFFS 0xcbf29ce484222325ULL
     #define FNV_PRIM 1099511628211ULL
+    #define CRC_TO_BE(x) (uint64_t)htobe32(((x>>32) & 0xffffffff)) << 32 | htobe32((x & 0xffffffff))
 
 #else
     const char *checksum_name = "NONE";
     typedef uint32_t checksum_t;
+    #define CRC_TO_BE(x) (x)
 #endif
 
 /* Function prototypes */
@@ -59,7 +65,7 @@ inline static void update_checksum(checksum_t *checksum, uint8_t data);
 
 
 /* Function implementations */
-#if ((DFU_VERIFY_CHECKSUM == CRC32FAST) || (DFU_VERIFY_CHECKSUM == CRC64FAST))
+#if ((DFU_USE_CHECKSUM == CRC32FAST) || (DFU_USE_CHECKSUM == CRC64FAST))
 
 static checksum_t table[0x100];
 
@@ -83,7 +89,7 @@ static void update_checksum(checksum_t *checksum, uint8_t data) {
     *checksum = (*checksum >> 8) ^ table[data];
 }
 
-#elif ((DFU_VERIFY_CHECKSUM == CRC32SMALL) || (DFU_VERIFY_CHECKSUM == CRC64SMALL))
+#elif ((DFU_USE_CHECKSUM == CRC32SMALL) || (DFU_USE_CHECKSUM == CRC64SMALL))
 
 static void init_checksum(checksum_t *checksum) {
     *checksum = CRC_INIT;
@@ -100,7 +106,7 @@ static void update_checksum(checksum_t *checksum, uint8_t data) {
     }
 }
 
-#elif ((DFU_VERIFY_CHECKSUM == FNV1A32) || (DFU_VERIFY_CHECKSUM == FNV1A64))
+#elif ((DFU_USE_CHECKSUM == FNV1A32) || (DFU_USE_CHECKSUM == FNV1A64))
 
 static void init_checksum(checksum_t *checksum) {
     *checksum = FNV_OFFS;
@@ -140,6 +146,7 @@ size_t append_checksum(void *data, size_t len, size_t bsize) {
         update_checksum(&cs, *buf);
         buf++;
     }
+    cs = CRC_TO_BE(cs);
     memcpy(buf, &cs, sizeof(cs));
     return len + sizeof(checksum_t);
 }
@@ -149,7 +156,8 @@ size_t validate_checksum(const void *data, size_t bsize)  {
     const uint8_t *buf = data;
     init_checksum(&cs);
     while(sizeof(checksum_t) <= bsize--) {
-        if (__memcmp(&cs, buf, sizeof(cs)) == 0) {
+        checksum_t csbe = CRC_TO_BE(cs);
+        if (__memcmp(&csbe, buf, sizeof(cs)) == 0) {
             return (size_t)(buf - (uint8_t *)data);
         }
         update_checksum(&cs, *buf);

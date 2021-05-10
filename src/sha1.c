@@ -65,12 +65,24 @@ void sha1Final(Sha1Context *context, uint8_t *digest);
 void sha1FinalRaw(Sha1Context *context, uint8_t *digest);
 void sha1ProcessBlock(Sha1Context *context);
 
+#ifndef htobe32
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 #define htobe32(x)      __builtin_bswap32(x)
-#define betoh32(x)      __builtin_bswap32(x)
+#define htobe16(x)      __builtin_bswap16(x)
 #else
 #define htobe32(x)      (x)
+#define htobe16(x)      (x)
+#endif
+#endif
+
+#ifndef betoh32
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#define betoh32(x)      __builtin_bswap32(x)
+#define betoh16(x)      __builtin_bswap16(x)
+#else
 #define betoh32(x)      (x)
+#define betoh16(x)      (x)
+#endif
 #endif
 
 #define MIN(x,y) ((x < y)?x : y)

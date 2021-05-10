@@ -530,10 +530,12 @@ static int dfu_serial_verify_flash(uint8_t dataType) {
     switch(dataType) {
     case 0: // APP Flash
         dptr = (uint8_t*)_APP_START;
+        dlen = _APP_LENGTH;
         break;
 #if defined(_EEPROM_ENABLED)
     case 1: // EEPROM
         dptr = (uint8_t*)_EE_START;
+        dlen = _EE_LENGTH;
         break;
 #endif
     default:
@@ -541,6 +543,7 @@ static int dfu_serial_verify_flash(uint8_t dataType) {
         break;
     }
 
+#if 0
     uint32_t cs;
     crc32_init(&cs);
     for(int i = 0; i < dlen; i++) {
@@ -549,7 +552,9 @@ static int dfu_serial_verify_flash(uint8_t dataType) {
 
     //TODO -  respond with 128bit hash or crc32 of the flashed data
     return (dfu_serial_.flash_data_crc == htobe32(cs)) ? SERIAL_ACK : SERIAL_NAK;
-    // return SERIAL_ACK;
+#else
+    return (validate_checksum(dptr, dlen) > 0) ? SERIAL_ACK : SERIAL_NAK;
+#endif
 }
 
 #if defined(STM32F1) || defined(STM32F4)

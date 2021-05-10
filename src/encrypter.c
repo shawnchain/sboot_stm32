@@ -122,7 +122,7 @@ int main(int argc, char **argv)
 
     aes_init();
     if (dir) {
-#if (DFU_VERIFY_CHECKSUM != _DISABLE)
+#if (DFU_USE_CHECKSUM != _DISABLE)
         if (crc) {
             size_t newlen = append_checksum(buf, length, blen);
 

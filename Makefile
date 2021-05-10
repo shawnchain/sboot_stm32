@@ -32,10 +32,11 @@ CRYPT_SRC   = src/arc4.c src/chacha.c src/gost.c src/raiden.c src/rc5.c src/spec
 CRYPT_SRC  += src/xtea.c src/xtea1.c src/blowfish.c src/rtea.c src/rc6.c src/rijndael.c
 CRYPT_SRC  += src/magma.c
 CRYPT_SRC  += src/checksum.c src/crypto.c
+CRYPT_SRC  += src/md5.c src/sha1.c src/sha256.c
 
 FW_SRC      = $(CRYPT_SRC) $(FWSTARTUP) src/descriptors.c src/bootloader.c src/rc5a.S src/chacha_a.S src/rc6a.S
 FW_SRC     += usart/stm32f4xx_gpio.c usart/stm32f4xx_rcc.c usart/stm32f4xx_usart.c usart/stm32f4xx_misc.c usart/usart.c usart/usart_f1.c usart/usart_f4.c
-FW_SRC     += src/swo.c src/printf.c src/md5.c src/sha1.c src/sha256.c
+FW_SRC     += src/swo.c src/printf.c
 
 SW_SRC      = $(CRYPT_SRC) src/encrypter.c
 TS_SRC      = $(filter-out src/crypto.c, $(CRYPT_SRC)) src/ctest.c
