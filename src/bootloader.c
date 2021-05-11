@@ -75,8 +75,13 @@ extern void System_Reset(void);
 extern uint8_t  __app_start;
 extern uint8_t  __romend;
 
-static uint32_t dfu_buffer[DFU_BUFSZ];
+/**
+ * @brief USB DFU Part
+ * 
+ */
 #if defined(ENABLE_USB)
+static uint32_t dfu_buffer[DFU_BUFSZ];
+
 static usbd_device dfu;
 
 static struct dfu_data_s {
@@ -306,11 +311,13 @@ static void dfu_init (void) {
 }
 #endif
 
-//
-// DFU SERIAL CODE
-//
-
+/**
+ * @brief Serial DFU Code
+ * 
+ */
 #if defined(ENABLE_USART)
+
+static uint32_t dfu_serial_buffer[DFU_BUFSZ];
 
 enum {
     DFU_SERIAL_RX_STATE_HEAD = 0,
@@ -525,7 +532,7 @@ static int dfu_serial_write_flash(unsigned char* buf, int blksize) {
 
 static int dfu_serial_verify_flash(uint8_t dataType) {
     uint8_t* dptr = 0;
-    int   dlen = dfu_serial_.flash_data_size;
+    int   dlen = 0; // dfu_serial_.flash_data_size;
 
     switch(dataType) {
     case 0: // APP Flash
@@ -813,8 +820,7 @@ int main (void) {
 #if defined(ENABLE_USART)
     usart_init(&usart, 115200, my_usart_rx_callback, NULL);
     usart_printf(&usart, DFU_STR_PRODUCT EOL);
-
-    dfu_serial_init((uint8_t*)dfu_buffer, sizeof(dfu_buffer));
+    dfu_serial_init((uint8_t*)dfu_serial_buffer, sizeof(dfu_serial_buffer));
 #endif
 
 #if defined(ENABLE_USB)

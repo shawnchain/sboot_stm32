@@ -237,7 +237,7 @@
 // #define ENABLE_SHA256
 
 /** Enable USB DFU */
-#define ENABLE_USB
+// #define ENABLE_USB
 
 /** Enable USART DFU, currently only F1/F4 are supported */
 #if defined(STM32F1) || defined(STM32F4)

@@ -414,13 +414,13 @@ stm32f103x8 :
 	$(MAKE) bootloader FWCPU='-mcpu=cortex-m3' \
 	                   FWSTARTUP='mcu/stm32f103.S' \
 	                   FWDEFS='STM32F1 STM32F103x6 USBD_ASM_DRIVER' \
-	                   LDPARAMS='ROMLEN=64K RAMLEN=20K'
+	                   LDPARAMS='ROMLEN=64K RAMLEN=20K APPALIGN=0x1000'
 
 stm32f103xb :
 	$(MAKE) bootloader FWCPU='-mcpu=cortex-m3' \
 	                   FWSTARTUP='mcu/stm32f103.S' \
 	                   FWDEFS='STM32F1 STM32F103x6 USBD_ASM_DRIVER' \
-	                   LDPARAMS='ROMLEN=128K RAMLEN=20K'
+	                   LDPARAMS='ROMLEN=128K RAMLEN=20K APPALIGN=0x1000'
 
 stm32f303xb :
 	$(MAKE) bootloader FWCPU='-mcpu=cortex-m4' \
@@ -563,7 +563,7 @@ stm32f446xe :
 	$(MAKE) bootloader FWCPU='-mcpu=cortex-m4' \
 	                   FWSTARTUP='mcu/stm32f4xx.S' \
 	                   FWDEFS='STM32F4 STM32F446xx' \
-	                   LDPARAMS='ROMLEN=512K RAMLEN=128K APPALIGN=0x4000'
+	                   LDPARAMS='ROMLEN=512K RAMLEN=128K APPALIGN=0x8000'
 
 stm32f446xe_hs :
 	$(MAKE) bootloader FWCPU='-mcpu=cortex-m4' \

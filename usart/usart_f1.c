@@ -21,7 +21,6 @@
 #if defined(STM32F1) && defined(ENABLE_USART)
 #include "usart.h"
 #include "stm32.h"
-#include "rb.h"
 
 #define USART_DIV(__PCLK__, __BAUD__)     (((__PCLK__)*25)/(4*(__BAUD__)))
 #define USART_DIVMANT(__PCLK__, __BAUD__) (USART_DIV((__PCLK__), (__BAUD__))/100)
@@ -83,7 +82,7 @@ void usart_poll(struct usart_device * usart) {
 
     // Sending(polling mode)
     int txcount = 0;
-    usart_fifo_t *txfifo = (usart_fifo_t*)usart->txfifo;
+    usart_tx_fifo_t *txfifo = usart->txfifo;
     while (!RB_EMPTY(*txfifo) && (USART1->SR & USART_SR_TXE) > 0) {
         // USART_SendData(USART1, RB_GET(*txfifo));
         USART1->DR = RB_GET(*txfifo);
@@ -105,7 +104,7 @@ void usart_poll(struct usart_device * usart) {
 
     // Receiving
     int rxcount = 0;
-    usart_fifo_t *rxfifo = (usart_fifo_t*)usart->rxfifo;
+    usart_rx_fifo_t *rxfifo = usart->rxfifo;
     while (!RB_FULL(*rxfifo) && (USART1->SR & USART_SR_RXNE) > 0) {
         RB_PUT(*rxfifo, USART1->DR);
         rxcount++;
